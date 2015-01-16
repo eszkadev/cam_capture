@@ -1,0 +1,2 @@
+Easy program to capture images from the serial port.
+I use ov7670 (RGB565 mode) with Atmega16 connected with PC via ft232.
