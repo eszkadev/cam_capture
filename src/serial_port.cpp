@@ -11,7 +11,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name ``Szymon K??os'' nor the name of any other
+ * 3. Neither the name ``Szymon Kłos'' nor the name of any other
  *    contributor may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  * 
@@ -64,22 +64,27 @@ int setup_port(int port, int baud)
 	switch(baud)
 	{
 		case 9600:
+			std::cout << "speed: " << 9600 << std::endl;
 			cfsetospeed(&specs,B9600);
 			break;
 
 		case 57600:
+			std::cout << "speed: " << 57600 << std::endl;
 			cfsetospeed(&specs,B57600);
 			break;
 
 		case 115200:
+			std::cout << "speed: " << 115200 << std::endl;
 			cfsetospeed(&specs,B115200);
 			break;
 
 		case 460800:
+			std::cout << "speed: " << 460800 << std::endl;
 			cfsetospeed(&specs,B460800);
 			break;
 
 		default:
+			std::cout << "speed: " << 9600 << std::endl;
 			cfsetospeed(&specs,B9600);
 			break;
 	}
@@ -89,56 +94,4 @@ int setup_port(int port, int baud)
 	return 1;
 }
 
-int capture_image(int port, int size_x, int size_y, unsigned int** image)
-{
-	char buf;
-	char start[] = "START";
-	int i = 0;
-	int n, x, y;
-	char tmp[128];
 
-	status->set_text("Waiting for VSYNC...");
-	
-	spinner->show();
-	spinner->start();
-	
-	do
-	{
-		n = read(port, &buf, 1);
-		if(start[i] == buf)
-			i++;
-		else
-			i = 0;
-	}
-	while(n && i < strlen(start));
-
-	status->set_text("Loading data...");
-
-	spinner->stop();
-	spinner->hide();
-	progress->show();
-
-	for(y = 0; y < size_y; ++y)
-	{
-		for(x = 0; x < size_x; ++x)
-		{
-			n = read(port, &buf, 1);
-			image[x][y] = buf << 8;
-			n = read(port, &buf, 1);
-			image[x][y] += buf;
-		}
-
-		progress->pulse();
-		main_win->queue_draw();
-		
-		std::stringstream ss;
-		ss << y*100/size_y << "%";
-		
-		status->set_text(ss.str());
-	}
-
-	status->set_text("");
-	progress->hide();
-
-	return 1;
-}

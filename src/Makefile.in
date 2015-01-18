@@ -94,8 +94,8 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(uidir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_cam_capture_OBJECTS = main.$(OBJEXT) serial_port.$(OBJEXT) \
-	EasyBMP.$(OBJEXT)
+am_cam_capture_OBJECTS = main.$(OBJEXT) EasyBMP.$(OBJEXT) \
+	serial.$(OBJEXT)
 cam_capture_OBJECTS = $(am_cam_capture_OBJECTS)
 am__DEPENDENCIES_1 =
 cam_capture_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -299,7 +299,10 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 uidir = $(pkgdatadir)/ui
-ui_DATA = cam_capture.ui
+ui_DATA = cam_capture.ui \
+	ui.h \
+	ui.cpp
+
 AM_CPPFLAGS = \
 	-std=c++11 \
 	-DPACKAGE_LOCALE_DIR=\""$(localedir)"\" \
@@ -313,14 +316,14 @@ AM_CFLAGS = \
 
 cam_capture_SOURCES = \
 	main.cc \
-	serial_port.cpp \
-	serial_port.h \
 	preview.h \
 	EasyBMP/EasyBMP.cpp \
 	EasyBMP/EasyBMP.h \
 	EasyBMP/EasyBMP_BMP.h \
 	EasyBMP/EasyBMP_DataStructures.h \
-	EasyBMP/EasyBMP_VariousBMPutilities.h
+	EasyBMP/EasyBMP_VariousBMPutilities.h \
+	serial.h \
+	serial.cpp
 
 cam_capture_LDFLAGS = $(am__append_1)
 cam_capture_LDADD = $(CAM_CAPTURE_LIBS)
@@ -414,7 +417,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/EasyBMP.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/serial_port.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/serial.Po@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

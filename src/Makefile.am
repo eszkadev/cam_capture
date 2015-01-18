@@ -22,14 +22,14 @@ bin_PROGRAMS = cam_capture
 
 cam_capture_SOURCES = \
 	main.cc \
-	serial_port.cpp \
-	serial_port.h \
 	preview.h \
 	EasyBMP/EasyBMP.cpp \
 	EasyBMP/EasyBMP.h \
 	EasyBMP/EasyBMP_BMP.h \
 	EasyBMP/EasyBMP_DataStructures.h \
-	EasyBMP/EasyBMP_VariousBMPutilities.h
+	EasyBMP/EasyBMP_VariousBMPutilities.h \
+	serial.h \
+	serial.cpp
 
 cam_capture_LDFLAGS = 
 

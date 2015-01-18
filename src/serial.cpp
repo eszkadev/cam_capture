@@ -1,6 +1,6 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*-  */
 /*
- * serial_port.h
+ * serial.cpp
  * Copyright (C) 2015 Szymon Kłos <eszkadev@gmail.com>
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,21 +28,117 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _SERIAL_PORT_
-#define _SERIAL_PORT_
+#include "serial.h"
 
-#include "preview.h"
+WindowsSerialImpl::WindowsSerialImpl()
+{
+}
 
-#include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <termios.h>
-#include <gtkmm.h>
-#include <string>
-#include <iostream>
+WindowsSerialImpl::~WindowsSerialImpl()
+{
+}
 
-int open_port(const char* device);
-int setup_port(int port, int baud);
-int capture_image(int port, int size_x, int size_y, unsigned int** image);
+void WindowsSerialImpl::open_port(const char* port_name)
+{
+}
+
+void WindowsSerialImpl::set_baud(int baud)
+{
+}
+
+unsigned char WindowsSerialImpl::read_byte()
+{
+	unsigned char ret = 0;
+	return ret;
+}
+
+bool WindowsSerialImpl::is_open()
+{
+	return false;
+}
+
+void WindowsSerialImpl::close()
+{
+}
+
+#ifdef __linux__
+LinuxSerialImpl::LinuxSerialImpl()
+{
+}
+
+LinuxSerialImpl::~LinuxSerialImpl()
+{
+}
+
+void LinuxSerialImpl::open_port(const char* port_name)
+{
+	_descriptor = open(port_name, O_RDWR | O_NOCTTY | O_NDELAY);
+	if (_descriptor == -1)
+	{
+		// error
+	}else
+	{
+		_port_name = (const char*) malloc(sizeof(const char) * (strlen(port_name) + 1));
+		_port_name = port_name;
+		fcntl(_descriptor, F_SETFL, 0);
+	}
+}
+
+void LinuxSerialImpl::set_baud(int baud)
+{
+	_baud = baud;
+
+	struct termios specs;
+	tcgetattr(_descriptor, &specs);
+	specs.c_cflag = (CLOCAL | CREAD );
+	specs.c_oflag = (OPOST | CR3);
+
+	switch(baud)
+	{
+		case 9600:
+			cfsetospeed(&specs,B9600);
+			break;
+
+		case 57600:
+			cfsetospeed(&specs,B57600);
+			break;
+
+		case 115200:
+			cfsetospeed(&specs,B115200);
+			break;
+
+		case 460800:
+			cfsetospeed(&specs,B460800);
+			break;
+
+		default:
+			_baud = 9600;
+			cfsetospeed(&specs,B9600);
+			break;
+	}
+
+	tcsetattr(_descriptor, TCSANOW, &specs);
+}
+
+unsigned char LinuxSerialImpl::read_byte()
+{
+	unsigned char ret;
+
+	read(_descriptor, &ret, 1);
+
+	return ret;
+}
+
+bool LinuxSerialImpl::is_open()
+{
+	if(_descriptor != -1)
+		return true;
+
+	return false;
+}
+
+void LinuxSerialImpl::close()
+{
+}
 
 #endif

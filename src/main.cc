@@ -11,7 +11,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name ``Szymon K??os'' nor the name of any other
+ * 3. Neither the name ``Szymon Kłos'' nor the name of any other
  *    contributor may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  * 
@@ -30,7 +30,7 @@
 
 #include "preview.h"
 #include "config.h"
-#include "serial_port.h"
+#include "serial.h"
 #include "EasyBMP/EasyBMP.h"
 
 #include <gtkmm.h>
@@ -42,11 +42,9 @@
 /* For testing propose use the local (not installed) ui file */
 /* #define UI_FILE PACKAGE_DATA_DIR"/ui/cam_capture.ui" */
 #define UI_FILE "src/cam_capture.ui"
-#define PORT_NOT_OPEN -1
 
 int size_x = 80;
 int size_y = 60;
-int port = PORT_NOT_OPEN;
 std::string port_path;
 
 Gtk::Main* kit = 0;
@@ -56,35 +54,35 @@ Gtk::Button* save_button = 0;
 Gtk::Button* open_button = 0;
 Gtk::Label* status = 0;
 Gtk::Entry* port_edit = 0;
+Gtk::ComboBoxText* speed_cb = 0;
 Gtk::Spinner* spinner = 0;
 Preview* preview = 0;
 Gtk::Box* container = 0;
 Gtk::ProgressBar* progress = 0;
+
 std::thread* capture_thread = 0, *gtk_thread = 0;
+Serial* serial = 0;
 
 void open_serial_port()
 {
 	std::string path = port_edit->get_text();
-	if(port_path != path)
-	{
-		if(port != PORT_NOT_OPEN)
-			close(port);
-		
-		port = open_port(path.c_str());
 
-		if(port >= 0)
-		{
-			setup_port(port, 57600);
-			port_path = path;
-			save_button->set_sensitive(true);
-			capture_button->set_sensitive(true);
-		}
-		else
-		{
-			Gtk::MessageDialog error_dialog("Cannot open this port");
-			error_dialog.run();
-			port = PORT_NOT_OPEN;
-		}
+	if(serial->is_open())
+		serial->close();
+		
+	serial->open_port(path.c_str());
+
+	if(serial->is_open())
+	{
+		serial->set_baud(atoi(speed_cb->get_active_text().c_str()));
+		port_path = path;
+		save_button->set_sensitive(true);
+		capture_button->set_sensitive(true);
+	}
+	else
+	{
+		Gtk::MessageDialog error_dialog("Cannot open this port");
+		error_dialog.run();
 	}
 }
 
@@ -138,9 +136,63 @@ void save_image()
 	}
 }
 
+int capture_image(int size_x, int size_y, unsigned int** image)
+{
+	char buf;
+	char start[] = "START";
+	int i = 0;
+	int n, x, y;
+	char tmp[128];
+
+	status->set_text("Waiting for VSYNC...");
+
+	spinner->show();
+	spinner->start();
+
+	do
+	{
+		buf = serial->read_byte();
+		if(start[i] == buf)
+			i++;
+		else
+			i = 0;
+	}
+	while(i < strlen(start));
+
+	status->set_text("Loading data...");
+
+	spinner->stop();
+	spinner->hide();
+	progress->show();
+
+	for(y = 0; y < size_y; ++y)
+	{
+		for(x = 0; x < size_x; ++x)
+		{
+			buf = serial->read_byte();
+			image[x][y] = buf << 8;
+			buf = serial->read_byte();
+			image[x][y] += buf;
+		}
+
+		progress->pulse();
+		main_win->queue_draw();
+
+		std::stringstream ss;
+		ss << y*100/size_y << "%";
+
+		status->set_text(ss.str());
+	}
+
+	status->set_text("");
+	progress->hide();
+
+	return 1;
+}
+
 void capture()
 {
-	capture_image(port, size_x, size_y, preview->get_buffer());
+	capture_image(size_x, size_y, preview->get_buffer());
 	preview->signal_draw();
 	main_win->queue_draw();
 	capture_button->set_sensitive(true);
@@ -183,6 +235,13 @@ int main(int argc, char *argv[])
 	builder->get_widget("status", status);
 	builder->get_widget("spinner", spinner);
 	builder->get_widget("port", port_edit);
+	builder->get_widget("speed", speed_cb);
+
+	speed_cb->append("9600");
+	speed_cb->append("57600");
+	speed_cb->append("115200");
+	speed_cb->append("460800");
+	speed_cb->set_active_text("57600");
 	
 	builder->get_widget("progress", progress);
 	progress->set_pulse_step(0.1);
@@ -192,6 +251,12 @@ int main(int argc, char *argv[])
 	container->pack_start((Gtk::Widget&)*preview, true, true);
 	preview->set_size_request(160, 120);
 	preview->show();
+
+#ifdef __linux__
+	serial = new LinuxSerialImpl();
+#else
+	serial = new WindowsSerialImpl();
+#endif
 
 	capture_button->set_sensitive(false);
 	capture_button->signal_clicked().connect(sigc::ptr_fun(capture_thread_start));

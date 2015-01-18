@@ -1,6 +1,6 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*-  */
 /*
- * serial_port.h
+ * serial.h
  * Copyright (C) 2015 Szymon Kłos <eszkadev@gmail.com>
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,21 +28,57 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _SERIAL_PORT_
-#define _SERIAL_PORT_
+#ifdef __linux__
+	#include <unistd.h>
+	#include <fcntl.h>
+	#include <errno.h>
+	#include <termios.h>
+	#include <string.h>
+	#include <stdlib.h>
+#endif
 
-#include "preview.h"
+class Serial
+{
+public:
+	Serial() {};
+	~Serial() {};
 
-#include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <termios.h>
-#include <gtkmm.h>
-#include <string>
-#include <iostream>
+	virtual void open_port(const char* port_name) = 0;
+	virtual void set_baud(int baud) = 0;
+	virtual unsigned char read_byte() = 0;
+	virtual bool is_open() = 0;
+	virtual void close() = 0;
+};
 
-int open_port(const char* device);
-int setup_port(int port, int baud);
-int capture_image(int port, int size_x, int size_y, unsigned int** image);
+class WindowsSerialImpl : public Serial
+{
+public:
+	WindowsSerialImpl();
+	~WindowsSerialImpl();
 
+	virtual void open_port(const char* port_name);
+	virtual void set_baud(int baud);
+	virtual unsigned char read_byte();
+	virtual bool is_open();
+	virtual void close();
+};
+
+#ifdef __linux__
+class LinuxSerialImpl : public Serial
+{
+public:
+	LinuxSerialImpl();
+	~LinuxSerialImpl();
+
+	virtual void open_port(const char* port_name);
+	virtual void set_baud(int baud);
+	virtual unsigned char read_byte();
+	virtual bool is_open();
+	virtual void close();
+
+private:
+	int _descriptor;
+	int _baud;
+	const char* _port_name;
+};
 #endif
