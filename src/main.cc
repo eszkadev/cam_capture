@@ -43,8 +43,8 @@
 /* #define UI_FILE PACKAGE_DATA_DIR"/ui/cam_capture.ui" */
 #define UI_FILE "src/cam_capture.ui"
 
-int size_x = 80;
-int size_y = 60;
+int size_x = 160;
+int size_y = 120;
 std::string port_path;
 
 Gtk::Main* kit = 0;
@@ -103,16 +103,16 @@ void save_image()
 		std::string filename = save_dialog.get_filename();
 
 		BMP Output;
-		Output.SetSize(size_x, size_y);
+		Output.SetSize(size_x*2, size_y*2);
 		Output.SetBitDepth(24);
 
 		unsigned char r,g,b;
 
-		for(int y = 0; y < size_y; y++)
+		for(int y = 0; y < size_y*2; y += 2)
 		{
-			for(int x = 0; x < size_x; x++)
+			for(int x = 0; x < size_x*2; x += 2)
 			{
-				unsigned int color = preview->get_buffer()[x][y];
+				unsigned int color = preview->get_buffer()[x/2][y/2];
 
 				r = (unsigned char)((color >> 11) << 3);
 				g = (unsigned char)(((color & 2016) >> 5) << 2);
@@ -125,10 +125,25 @@ void save_image()
 				if(b > 255)
 					b = 255;
 
-				Output(x,y)->Red = r;
-				Output(x,y)->Green = g;
-				Output(x,y)->Blue = b;
-				Output(x,y)->Alpha = 0;
+				Output(x, y)->Red = r;
+				Output(x, y)->Green = g;
+				Output(x, y)->Blue = b;
+				Output(x, y)->Alpha = 0;
+
+				Output(x, y + 1)->Red = r;
+				Output(x, y + 1)->Green = g;
+				Output(x, y + 1)->Blue = b;
+				Output(x, y + 1)->Alpha = 0;
+
+				Output(x + 1, y + 1)->Red = r;
+				Output(x + 1, y + 1)->Green = g;
+				Output(x + 1, y + 1)->Blue = b;
+				Output(x + 1, y + 1)->Alpha = 0;
+
+				Output(x + 1, y)->Red = r;
+				Output(x + 1, y)->Green = g;
+				Output(x + 1, y)->Blue = b;
+				Output(x + 1, y)->Alpha = 0;
 			}
 		}
 
@@ -136,13 +151,13 @@ void save_image()
 	}
 }
 
-int capture_image(int size_x, int size_y, unsigned int** image)
+void capture_image(int size_x, int size_y, unsigned int** image)
 {
-	char buf;
-	char start[] = "START";
-	int i = 0;
-	int n, x, y;
-	char tmp[128];
+	unsigned int buf;
+	const char start[] = "START";
+	unsigned int i = 0;
+	unsigned int n, x, y;
+	unsigned char tmp[128];
 
 	status->set_text("Waiting for VSYNC...");
 
@@ -186,8 +201,6 @@ int capture_image(int size_x, int size_y, unsigned int** image)
 
 	status->set_text("");
 	progress->hide();
-
-	return 1;
 }
 
 void capture()
@@ -249,7 +262,7 @@ int main(int argc, char *argv[])
 	
 	preview = new Preview(size_x, size_y);
 	container->pack_start((Gtk::Widget&)*preview, true, true);
-	preview->set_size_request(160, 120);
+	preview->set_size_request(size_x*2, size_y*2);
 	preview->show();
 
 #ifdef __linux__
