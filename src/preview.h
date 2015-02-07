@@ -37,7 +37,7 @@ class Preview : public Gtk::DrawingArea
 {
 public:
 
-	Preview(int x, int y) : Gtk::DrawingArea()
+	Preview(unsigned int x, unsigned int y) : Gtk::DrawingArea()
 	{
 		_size_x = x;
 		_size_y = y;
@@ -90,10 +90,32 @@ public:
 		return FALSE;
 	}
 
+	void change_res(unsigned int w, unsigned int h)
+	{
+		_size_x = w;
+		_size_y = h;
+
+		/*for(int i = 0; i < _size_x; i++)
+		{
+			delete _image;
+		}*/
+		delete[] _image;
+
+		_image = (unsigned int**)malloc(sizeof(unsigned int*) * (_size_x));
+		for(int i = 0; i < _size_x; i++)
+		{
+			_image[i] = (unsigned int*)malloc(sizeof(unsigned int) * (_size_y));
+			for(int j = 0; j < _size_y; j++)
+				_image[i][j] = 0;
+		}
+
+		set_size_request(_size_x*2, _size_y*2);
+	}
+
 private:
 	 unsigned int** _image;
-	 int _size_x;
-	 int _size_y;
+	 unsigned int _size_x;
+	 unsigned int _size_y;
 };
 
 #endif

@@ -48,6 +48,7 @@ public:
 	virtual unsigned char read_byte() = 0;
 	virtual bool is_open() = 0;
 	virtual void close() = 0;
+	virtual void flush() = 0;
 };
 
 class WindowsSerialImpl : public Serial
@@ -61,6 +62,7 @@ public:
 	virtual unsigned char read_byte();
 	virtual bool is_open();
 	virtual void close();
+	virtual void flush();
 };
 
 #ifdef __linux__
@@ -75,6 +77,7 @@ public:
 	virtual unsigned char read_byte();
 	virtual bool is_open();
 	virtual void close();
+	virtual void flush();
 
 private:
 	int _descriptor;

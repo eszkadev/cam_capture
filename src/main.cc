@@ -47,6 +47,9 @@ int size_x = 160;
 int size_y = 120;
 std::string port_path;
 
+const char r120[] = "160x120";
+const char r240[] = "320x240";
+
 Gtk::Main* kit = 0;
 Gtk::Window* main_win = 0;
 Gtk::Button* capture_button = 0;
@@ -55,6 +58,7 @@ Gtk::Button* open_button = 0;
 Gtk::Label* status = 0;
 Gtk::Entry* port_edit = 0;
 Gtk::ComboBoxText* speed_cb = 0;
+Gtk::ComboBoxText* resolution_cb = 0;
 Gtk::Spinner* spinner = 0;
 Preview* preview = 0;
 Gtk::Box* container = 0;
@@ -82,6 +86,28 @@ void open_serial_port()
 	else
 	{
 		Gtk::MessageDialog error_dialog("Cannot open this port");
+		error_dialog.run();
+	}
+}
+
+void change_resolution()
+{
+	std::string res = resolution_cb->get_active_text().c_str();
+	if(res == r120)
+	{
+		size_x = 160;
+		size_y = 120;
+		preview->change_res(size_x, size_y);
+	}
+	else if(res == r240)
+	{
+		size_x = 320;
+		size_y = 240;
+		preview->change_res(size_x, size_y);
+	}
+	else
+	{
+		Gtk::MessageDialog error_dialog("Unsupported resolution");
 		error_dialog.run();
 	}
 }
@@ -154,15 +180,15 @@ void save_image()
 void capture_image(int size_x, int size_y, unsigned int** image)
 {
 	unsigned int buf;
-	const char start[] = "START";
+	const char start[] = "START\0";
 	unsigned int i = 0;
-	unsigned int n, x, y;
-	unsigned char tmp[128];
 
 	status->set_text("Waiting for VSYNC...");
 
 	spinner->show();
 	spinner->start();
+
+	serial->flush();
 
 	do
 	{
@@ -180,9 +206,9 @@ void capture_image(int size_x, int size_y, unsigned int** image)
 	spinner->hide();
 	progress->show();
 
-	for(y = 0; y < size_y; ++y)
+	for(unsigned int y = 0; y < size_y; ++y)
 	{
-		for(x = 0; x < size_x; ++x)
+		for(unsigned int x = 0; x < size_x; ++x)
 		{
 			buf = serial->read_byte();
 			image[x][y] = buf << 8;
@@ -208,14 +234,22 @@ void capture()
 	capture_image(size_x, size_y, preview->get_buffer());
 	preview->signal_draw();
 	main_win->queue_draw();
+
 	capture_button->set_sensitive(true);
 	save_button->set_sensitive(true);
+	speed_cb->set_sensitive(true);
+	resolution_cb->set_sensitive(true);
+	open_button->set_sensitive(true);
 }
 
 void capture_thread_start()
 {
 	capture_button->set_sensitive(false);
 	save_button->set_sensitive(false);
+	speed_cb->set_sensitive(false);
+	resolution_cb->set_sensitive(false);
+	open_button->set_sensitive(false);
+
 	capture_thread = new std::thread(capture);
 }
 
@@ -249,12 +283,18 @@ int main(int argc, char *argv[])
 	builder->get_widget("spinner", spinner);
 	builder->get_widget("port", port_edit);
 	builder->get_widget("speed", speed_cb);
+	builder->get_widget("resolution", resolution_cb);
 
 	speed_cb->append("9600");
 	speed_cb->append("57600");
 	speed_cb->append("115200");
 	speed_cb->append("460800");
 	speed_cb->set_active_text("57600");
+
+	resolution_cb->append(r120);
+	resolution_cb->append(r240);
+	resolution_cb->set_active_text(r120);
+	resolution_cb->signal_changed().connect(sigc::ptr_fun(change_resolution));
 	
 	builder->get_widget("progress", progress);
 	progress->set_pulse_step(0.1);
@@ -283,7 +323,8 @@ int main(int argc, char *argv[])
 	{
 		gtk_thread = new std::thread(gtk_thread_start);
 		gtk_thread->join();
-		capture_thread->join();
+		if(capture_thread && capture_thread->joinable())
+			capture_thread->join();
 	}
 	
 	return 0;

@@ -61,6 +61,10 @@ void WindowsSerialImpl::close()
 {
 }
 
+void WindowsSerialImpl::flush()
+{
+}
+
 #ifdef __linux__
 LinuxSerialImpl::LinuxSerialImpl()
 {
@@ -139,6 +143,11 @@ bool LinuxSerialImpl::is_open()
 
 void LinuxSerialImpl::close()
 {
+}
+
+void LinuxSerialImpl::flush()
+{
+	tcflush(_descriptor, TCIOFLUSH);
 }
 
 #endif
