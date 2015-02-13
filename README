@@ -1,2 +1,8 @@
 Easy program to capture images from the serial port.
 I use ov7670 (RGB565 mode) with Atmega16 connected with PC via ft232.
+
+If you want to use console mode, you should comment "#define _WITH_GUI" in main.cc
+
+To compile project with gui on linux you will need gtkmm-3 libs. For windows version no external libs needed.
+
+Project contain Visual Studio 2010 and Anjuta project files.

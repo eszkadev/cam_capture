@@ -49,11 +49,23 @@ public:
 			for(int j = 0; j < _size_y; j++)
 				_image[i][j] = 0;
 		}
+
+		set_size_request(_size_x*2, _size_y*2);
 	};
 
 	unsigned int** get_buffer()
 	{
 		return _image;
+	}
+
+	unsigned int get_size_x()
+	{
+		return _size_x;
+	}
+
+	unsigned int get_size_y()
+	{
+		return _size_y;
 	}
 
 	virtual bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
@@ -95,10 +107,6 @@ public:
 		_size_x = w;
 		_size_y = h;
 
-		/*for(int i = 0; i < _size_x; i++)
-		{
-			delete _image;
-		}*/
 		delete[] _image;
 
 		_image = (unsigned int**)malloc(sizeof(unsigned int*) * (_size_x));

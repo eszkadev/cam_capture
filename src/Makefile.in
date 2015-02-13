@@ -14,7 +14,6 @@
 
 @SET_MAKE@
 
-
 VPATH = @srcdir@
 am__is_gnu_make = test -n '$(MAKEFILE_LIST)' && test -n '$(MAKELEVEL)'
 am__make_running_with_option = \
@@ -92,15 +91,22 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(uidir)"
+am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_cam_capture_OBJECTS = main.$(OBJEXT) EasyBMP.$(OBJEXT) \
-	serial.$(OBJEXT)
+am_cam_capture_OBJECTS = cam_capture-main.$(OBJEXT) \
+	cam_capture-serial.$(OBJEXT) cam_capture-ui.$(OBJEXT) \
+	cam_capture-EasyBMP.$(OBJEXT) cam_capture-linuxui.$(OBJEXT) \
+	cam_capture-cam_capture.$(OBJEXT)
 cam_capture_OBJECTS = $(am_cam_capture_OBJECTS)
 am__DEPENDENCIES_1 =
 cam_capture_DEPENDENCIES = $(am__DEPENDENCIES_1)
-cam_capture_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
-	$(cam_capture_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
+cam_capture_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(cam_capture_CXXFLAGS) \
+	$(CXXFLAGS) $(cam_capture_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -117,31 +123,38 @@ DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+LTCXXCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CXXFLAGS) $(CXXFLAGS)
 AM_V_CXX = $(am__v_CXX_@AM_V@)
 am__v_CXX_ = $(am__v_CXX_@AM_DEFAULT_V@)
 am__v_CXX_0 = @echo "  CXX     " $@;
 am__v_CXX_1 = 
 CXXLD = $(CXX)
-CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
-	-o $@
+CXXLINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
 AM_V_CC = $(am__v_CC_@AM_V@)
 am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
 am__v_CC_0 = @echo "  CC      " $@;
 am__v_CC_1 = 
 CCLD = $(CC)
-LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
@@ -153,34 +166,6 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
-am__vpath_adj = case $$p in \
-    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-    *) f=$$p;; \
-  esac;
-am__strip_dir = f=`echo $$p | sed -e 's|^.*/||'`;
-am__install_max = 40
-am__nobase_strip_setup = \
-  srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*|]/\\\\&/g'`
-am__nobase_strip = \
-  for p in $$list; do echo "$$p"; done | sed -e "s|$$srcdirstrip/||"
-am__nobase_list = $(am__nobase_strip_setup); \
-  for p in $$list; do echo "$$p $$p"; done | \
-  sed "s| $$srcdirstrip/| |;"' / .*\//!s/ .*/ ./; s,\( .*\)/[^/]*$$,\1,' | \
-  $(AWK) 'BEGIN { files["."] = "" } { files[$$2] = files[$$2] " " $$1; \
-    if (++n[$$2] == $(am__install_max)) \
-      { print $$2, files[$$2]; n[$$2] = 0; files[$$2] = "" } } \
-    END { for (dir in files) print dir, files[dir] }'
-am__base_list = \
-  sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
-  sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
-am__uninstall_files_from_dir = { \
-  test -z "$$files" \
-    || { test ! -d "$$dir" && test ! -f "$$dir" && test ! -r "$$dir"; } \
-    || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
-         $(am__cd) "$$dir" && rm -f $$files; }; \
-  }
-DATA = $(ui_DATA)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 # Read a list of newline-separated strings from the standard input,
 # and print each of them once, without duplicates.  Input order is
@@ -204,35 +189,58 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
+AR = @AR@
+AS = @AS@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 CAM_CAPTURE_CFLAGS = @CAM_CAPTURE_CFLAGS@
 CAM_CAPTURE_LIBS = @CAM_CAPTURE_LIBS@
+CC = @CC@
+CCDEPMODE = @CCDEPMODE@
+CFLAGS = @CFLAGS@
+CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CXX = @CXX@
+CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DLLTOOL = @DLLTOOL@
+DSYMUTIL = @DSYMUTIL@
+DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
+EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+FGREP = @FGREP@
+GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
+LIBTOOL = @LIBTOOL@
+LIPO = @LIPO@
+LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
+MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
+NM = @NM@
+NMEDIT = @NMEDIT@
+OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
+OTOOL = @OTOOL@
+OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -244,6 +252,8 @@ PATH_SEPARATOR = @PATH_SEPARATOR@
 PKG_CONFIG = @PKG_CONFIG@
 PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
 PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
+RANLIB = @RANLIB@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -252,7 +262,10 @@ abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
+ac_ct_AR = @ac_ct_AR@
+ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
+ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -299,9 +312,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 uidir = $(pkgdatadir)/ui
-ui_DATA = cam_capture.ui
 AM_CPPFLAGS = \
-	-std=c++11 \
 	-DPACKAGE_LOCALE_DIR=\""$(localedir)"\" \
 	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
 	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\" \
@@ -312,23 +323,30 @@ AM_CFLAGS = \
 	 -g
 
 cam_capture_SOURCES = \
-	main.cc \
-	preview.h \
-	EasyBMP/EasyBMP.cpp \
-	EasyBMP/EasyBMP.h \
-	EasyBMP/EasyBMP_BMP.h \
-	EasyBMP/EasyBMP_DataStructures.h \
-	EasyBMP/EasyBMP_VariousBMPutilities.h \
-	serial.h \
-	serial.cpp
+	../cam_capture/main.cc \
+	../cam_capture/preview.h \
+	../cam_capture/serial.cpp \
+	../cam_capture/serial.h \
+	../cam_capture/ui.cpp \
+	../cam_capture/ui.h \
+	../cam_capture/EasyBMP/EasyBMP.cpp \
+	../cam_capture/EasyBMP/EasyBMP.h \
+	../cam_capture/EasyBMP/EasyBMP_BMP.h \
+	../cam_capture/EasyBMP/EasyBMP_DataStructures.h \
+	../cam_capture/EasyBMP/EasyBMP_VariousBMPutilities.h \
+	../cam_capture/cam_capture.h \
+	../cam_capture/linuxui.cpp \
+	../cam_capture/linuxui.h \
+	../cam_capture/cam_capture.cpp
 
+cam_capture_CXXFLAGS = -std=c++11 
 cam_capture_LDFLAGS = $(am__append_1)
 cam_capture_LDADD = $(CAM_CAPTURE_LIBS)
 EXTRA_DIST = $(ui_DATA)
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .cc .cpp .o .obj
+.SUFFIXES: .cc .cpp .lo .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -369,6 +387,7 @@ install-binPROGRAMS: $(bin_PROGRAMS)
 	for p in $$list; do echo "$$p $$p"; done | \
 	sed 's/$(EXEEXT)$$//' | \
 	while read p p1; do if test -f $$p \
+	 || test -f $$p1 \
 	  ; then echo "$$p"; echo "$$p"; else :; fi; \
 	done | \
 	sed -e 'p;s,.*/,,;n;h' \
@@ -383,8 +402,8 @@ install-binPROGRAMS: $(bin_PROGRAMS)
 	while read type dir files; do \
 	    if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
 	    test -z "$$files" || { \
-	      echo " $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$files '$(DESTDIR)$(bindir)$$dir'"; \
-	      $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$files "$(DESTDIR)$(bindir)$$dir" || exit $$?; \
+	    echo " $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files '$(DESTDIR)$(bindir)$$dir'"; \
+	    $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files "$(DESTDIR)$(bindir)$$dir" || exit $$?; \
 	    } \
 	; done
 
@@ -400,7 +419,13 @@ uninstall-binPROGRAMS:
 	cd "$(DESTDIR)$(bindir)" && rm -f $$files
 
 clean-binPROGRAMS:
-	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
+	@list='$(bin_PROGRAMS)'; test -n "$$list" || exit 0; \
+	echo " rm -f" $$list; \
+	rm -f $$list || exit $$?; \
+	test -n "$(EXEEXT)" || exit 0; \
+	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
+	echo " rm -f" $$list; \
+	rm -f $$list
 
 cam_capture$(EXEEXT): $(cam_capture_OBJECTS) $(cam_capture_DEPENDENCIES) $(EXTRA_cam_capture_DEPENDENCIES) 
 	@rm -f cam_capture$(EXEEXT)
@@ -412,9 +437,12 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/EasyBMP.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/serial.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cam_capture-EasyBMP.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cam_capture-cam_capture.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cam_capture-linuxui.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cam_capture-main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cam_capture-serial.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cam_capture-ui.Po@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -430,19 +458,96 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
-EasyBMP.o: EasyBMP/EasyBMP.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT EasyBMP.o -MD -MP -MF $(DEPDIR)/EasyBMP.Tpo -c -o EasyBMP.o `test -f 'EasyBMP/EasyBMP.cpp' || echo '$(srcdir)/'`EasyBMP/EasyBMP.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/EasyBMP.Tpo $(DEPDIR)/EasyBMP.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='EasyBMP/EasyBMP.cpp' object='EasyBMP.o' libtool=no @AMDEPBACKSLASH@
+.cc.lo:
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o EasyBMP.o `test -f 'EasyBMP/EasyBMP.cpp' || echo '$(srcdir)/'`EasyBMP/EasyBMP.cpp
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
 
-EasyBMP.obj: EasyBMP/EasyBMP.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT EasyBMP.obj -MD -MP -MF $(DEPDIR)/EasyBMP.Tpo -c -o EasyBMP.obj `if test -f 'EasyBMP/EasyBMP.cpp'; then $(CYGPATH_W) 'EasyBMP/EasyBMP.cpp'; else $(CYGPATH_W) '$(srcdir)/EasyBMP/EasyBMP.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/EasyBMP.Tpo $(DEPDIR)/EasyBMP.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='EasyBMP/EasyBMP.cpp' object='EasyBMP.obj' libtool=no @AMDEPBACKSLASH@
+cam_capture-main.o: ../cam_capture/main.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cam_capture_CXXFLAGS) $(CXXFLAGS) -MT cam_capture-main.o -MD -MP -MF $(DEPDIR)/cam_capture-main.Tpo -c -o cam_capture-main.o `test -f '../cam_capture/main.cc' || echo '$(srcdir)/'`../cam_capture/main.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cam_capture-main.Tpo $(DEPDIR)/cam_capture-main.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../cam_capture/main.cc' object='cam_capture-main.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o EasyBMP.obj `if test -f 'EasyBMP/EasyBMP.cpp'; then $(CYGPATH_W) 'EasyBMP/EasyBMP.cpp'; else $(CYGPATH_W) '$(srcdir)/EasyBMP/EasyBMP.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cam_capture_CXXFLAGS) $(CXXFLAGS) -c -o cam_capture-main.o `test -f '../cam_capture/main.cc' || echo '$(srcdir)/'`../cam_capture/main.cc
+
+cam_capture-main.obj: ../cam_capture/main.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cam_capture_CXXFLAGS) $(CXXFLAGS) -MT cam_capture-main.obj -MD -MP -MF $(DEPDIR)/cam_capture-main.Tpo -c -o cam_capture-main.obj `if test -f '../cam_capture/main.cc'; then $(CYGPATH_W) '../cam_capture/main.cc'; else $(CYGPATH_W) '$(srcdir)/../cam_capture/main.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cam_capture-main.Tpo $(DEPDIR)/cam_capture-main.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../cam_capture/main.cc' object='cam_capture-main.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cam_capture_CXXFLAGS) $(CXXFLAGS) -c -o cam_capture-main.obj `if test -f '../cam_capture/main.cc'; then $(CYGPATH_W) '../cam_capture/main.cc'; else $(CYGPATH_W) '$(srcdir)/../cam_capture/main.cc'; fi`
+
+cam_capture-serial.o: ../cam_capture/serial.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cam_capture_CXXFLAGS) $(CXXFLAGS) -MT cam_capture-serial.o -MD -MP -MF $(DEPDIR)/cam_capture-serial.Tpo -c -o cam_capture-serial.o `test -f '../cam_capture/serial.cpp' || echo '$(srcdir)/'`../cam_capture/serial.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cam_capture-serial.Tpo $(DEPDIR)/cam_capture-serial.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../cam_capture/serial.cpp' object='cam_capture-serial.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cam_capture_CXXFLAGS) $(CXXFLAGS) -c -o cam_capture-serial.o `test -f '../cam_capture/serial.cpp' || echo '$(srcdir)/'`../cam_capture/serial.cpp
+
+cam_capture-serial.obj: ../cam_capture/serial.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cam_capture_CXXFLAGS) $(CXXFLAGS) -MT cam_capture-serial.obj -MD -MP -MF $(DEPDIR)/cam_capture-serial.Tpo -c -o cam_capture-serial.obj `if test -f '../cam_capture/serial.cpp'; then $(CYGPATH_W) '../cam_capture/serial.cpp'; else $(CYGPATH_W) '$(srcdir)/../cam_capture/serial.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cam_capture-serial.Tpo $(DEPDIR)/cam_capture-serial.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../cam_capture/serial.cpp' object='cam_capture-serial.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cam_capture_CXXFLAGS) $(CXXFLAGS) -c -o cam_capture-serial.obj `if test -f '../cam_capture/serial.cpp'; then $(CYGPATH_W) '../cam_capture/serial.cpp'; else $(CYGPATH_W) '$(srcdir)/../cam_capture/serial.cpp'; fi`
+
+cam_capture-ui.o: ../cam_capture/ui.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cam_capture_CXXFLAGS) $(CXXFLAGS) -MT cam_capture-ui.o -MD -MP -MF $(DEPDIR)/cam_capture-ui.Tpo -c -o cam_capture-ui.o `test -f '../cam_capture/ui.cpp' || echo '$(srcdir)/'`../cam_capture/ui.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cam_capture-ui.Tpo $(DEPDIR)/cam_capture-ui.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../cam_capture/ui.cpp' object='cam_capture-ui.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cam_capture_CXXFLAGS) $(CXXFLAGS) -c -o cam_capture-ui.o `test -f '../cam_capture/ui.cpp' || echo '$(srcdir)/'`../cam_capture/ui.cpp
+
+cam_capture-ui.obj: ../cam_capture/ui.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cam_capture_CXXFLAGS) $(CXXFLAGS) -MT cam_capture-ui.obj -MD -MP -MF $(DEPDIR)/cam_capture-ui.Tpo -c -o cam_capture-ui.obj `if test -f '../cam_capture/ui.cpp'; then $(CYGPATH_W) '../cam_capture/ui.cpp'; else $(CYGPATH_W) '$(srcdir)/../cam_capture/ui.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cam_capture-ui.Tpo $(DEPDIR)/cam_capture-ui.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../cam_capture/ui.cpp' object='cam_capture-ui.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cam_capture_CXXFLAGS) $(CXXFLAGS) -c -o cam_capture-ui.obj `if test -f '../cam_capture/ui.cpp'; then $(CYGPATH_W) '../cam_capture/ui.cpp'; else $(CYGPATH_W) '$(srcdir)/../cam_capture/ui.cpp'; fi`
+
+cam_capture-EasyBMP.o: ../cam_capture/EasyBMP/EasyBMP.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cam_capture_CXXFLAGS) $(CXXFLAGS) -MT cam_capture-EasyBMP.o -MD -MP -MF $(DEPDIR)/cam_capture-EasyBMP.Tpo -c -o cam_capture-EasyBMP.o `test -f '../cam_capture/EasyBMP/EasyBMP.cpp' || echo '$(srcdir)/'`../cam_capture/EasyBMP/EasyBMP.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cam_capture-EasyBMP.Tpo $(DEPDIR)/cam_capture-EasyBMP.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../cam_capture/EasyBMP/EasyBMP.cpp' object='cam_capture-EasyBMP.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cam_capture_CXXFLAGS) $(CXXFLAGS) -c -o cam_capture-EasyBMP.o `test -f '../cam_capture/EasyBMP/EasyBMP.cpp' || echo '$(srcdir)/'`../cam_capture/EasyBMP/EasyBMP.cpp
+
+cam_capture-EasyBMP.obj: ../cam_capture/EasyBMP/EasyBMP.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cam_capture_CXXFLAGS) $(CXXFLAGS) -MT cam_capture-EasyBMP.obj -MD -MP -MF $(DEPDIR)/cam_capture-EasyBMP.Tpo -c -o cam_capture-EasyBMP.obj `if test -f '../cam_capture/EasyBMP/EasyBMP.cpp'; then $(CYGPATH_W) '../cam_capture/EasyBMP/EasyBMP.cpp'; else $(CYGPATH_W) '$(srcdir)/../cam_capture/EasyBMP/EasyBMP.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cam_capture-EasyBMP.Tpo $(DEPDIR)/cam_capture-EasyBMP.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../cam_capture/EasyBMP/EasyBMP.cpp' object='cam_capture-EasyBMP.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cam_capture_CXXFLAGS) $(CXXFLAGS) -c -o cam_capture-EasyBMP.obj `if test -f '../cam_capture/EasyBMP/EasyBMP.cpp'; then $(CYGPATH_W) '../cam_capture/EasyBMP/EasyBMP.cpp'; else $(CYGPATH_W) '$(srcdir)/../cam_capture/EasyBMP/EasyBMP.cpp'; fi`
+
+cam_capture-linuxui.o: ../cam_capture/linuxui.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cam_capture_CXXFLAGS) $(CXXFLAGS) -MT cam_capture-linuxui.o -MD -MP -MF $(DEPDIR)/cam_capture-linuxui.Tpo -c -o cam_capture-linuxui.o `test -f '../cam_capture/linuxui.cpp' || echo '$(srcdir)/'`../cam_capture/linuxui.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cam_capture-linuxui.Tpo $(DEPDIR)/cam_capture-linuxui.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../cam_capture/linuxui.cpp' object='cam_capture-linuxui.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cam_capture_CXXFLAGS) $(CXXFLAGS) -c -o cam_capture-linuxui.o `test -f '../cam_capture/linuxui.cpp' || echo '$(srcdir)/'`../cam_capture/linuxui.cpp
+
+cam_capture-linuxui.obj: ../cam_capture/linuxui.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cam_capture_CXXFLAGS) $(CXXFLAGS) -MT cam_capture-linuxui.obj -MD -MP -MF $(DEPDIR)/cam_capture-linuxui.Tpo -c -o cam_capture-linuxui.obj `if test -f '../cam_capture/linuxui.cpp'; then $(CYGPATH_W) '../cam_capture/linuxui.cpp'; else $(CYGPATH_W) '$(srcdir)/../cam_capture/linuxui.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cam_capture-linuxui.Tpo $(DEPDIR)/cam_capture-linuxui.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../cam_capture/linuxui.cpp' object='cam_capture-linuxui.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cam_capture_CXXFLAGS) $(CXXFLAGS) -c -o cam_capture-linuxui.obj `if test -f '../cam_capture/linuxui.cpp'; then $(CYGPATH_W) '../cam_capture/linuxui.cpp'; else $(CYGPATH_W) '$(srcdir)/../cam_capture/linuxui.cpp'; fi`
+
+cam_capture-cam_capture.o: ../cam_capture/cam_capture.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cam_capture_CXXFLAGS) $(CXXFLAGS) -MT cam_capture-cam_capture.o -MD -MP -MF $(DEPDIR)/cam_capture-cam_capture.Tpo -c -o cam_capture-cam_capture.o `test -f '../cam_capture/cam_capture.cpp' || echo '$(srcdir)/'`../cam_capture/cam_capture.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cam_capture-cam_capture.Tpo $(DEPDIR)/cam_capture-cam_capture.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../cam_capture/cam_capture.cpp' object='cam_capture-cam_capture.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cam_capture_CXXFLAGS) $(CXXFLAGS) -c -o cam_capture-cam_capture.o `test -f '../cam_capture/cam_capture.cpp' || echo '$(srcdir)/'`../cam_capture/cam_capture.cpp
+
+cam_capture-cam_capture.obj: ../cam_capture/cam_capture.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cam_capture_CXXFLAGS) $(CXXFLAGS) -MT cam_capture-cam_capture.obj -MD -MP -MF $(DEPDIR)/cam_capture-cam_capture.Tpo -c -o cam_capture-cam_capture.obj `if test -f '../cam_capture/cam_capture.cpp'; then $(CYGPATH_W) '../cam_capture/cam_capture.cpp'; else $(CYGPATH_W) '$(srcdir)/../cam_capture/cam_capture.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cam_capture-cam_capture.Tpo $(DEPDIR)/cam_capture-cam_capture.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../cam_capture/cam_capture.cpp' object='cam_capture-cam_capture.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(cam_capture_CXXFLAGS) $(CXXFLAGS) -c -o cam_capture-cam_capture.obj `if test -f '../cam_capture/cam_capture.cpp'; then $(CYGPATH_W) '../cam_capture/cam_capture.cpp'; else $(CYGPATH_W) '$(srcdir)/../cam_capture/cam_capture.cpp'; fi`
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -457,27 +562,19 @@ EasyBMP.obj: EasyBMP/EasyBMP.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-install-uiDATA: $(ui_DATA)
-	@$(NORMAL_INSTALL)
-	@list='$(ui_DATA)'; test -n "$(uidir)" || list=; \
-	if test -n "$$list"; then \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(uidir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(uidir)" || exit 1; \
-	fi; \
-	for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  echo "$$d$$p"; \
-	done | $(am__base_list) | \
-	while read files; do \
-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(uidir)'"; \
-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(uidir)" || exit $$?; \
-	done
 
-uninstall-uiDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(ui_DATA)'; test -n "$(uidir)" || list=; \
-	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
-	dir='$(DESTDIR)$(uidir)'; $(am__uninstall_files_from_dir)
+.cpp.lo:
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+
+mostlyclean-libtool:
+	-rm -f *.lo
+
+clean-libtool:
+	-rm -rf .libs _libs
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -563,9 +660,9 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(PROGRAMS) $(DATA)
+all-am: Makefile $(PROGRAMS)
 installdirs:
-	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(uidir)"; do \
+	for dir in "$(DESTDIR)$(bindir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -600,7 +697,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -620,7 +717,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-uiDATA
+install-data-am:
 
 install-dvi: install-dvi-am
 
@@ -655,7 +752,8 @@ maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-am
 
-mostlyclean-am: mostlyclean-compile mostlyclean-generic
+mostlyclean-am: mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool
 
 pdf: pdf-am
 
@@ -665,24 +763,24 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-local uninstall-uiDATA
+uninstall-am: uninstall-binPROGRAMS uninstall-local
 
 .MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am check check-am clean \
-	clean-binPROGRAMS clean-generic cscopelist-am ctags ctags-am \
-	distclean distclean-compile distclean-generic distclean-tags \
-	distdir dvi dvi-am html html-am info info-am install \
-	install-am install-binPROGRAMS install-data install-data-am \
-	install-dvi install-dvi-am install-exec install-exec-am \
-	install-html install-html-am install-info install-info-am \
-	install-man install-pdf install-pdf-am install-ps \
-	install-ps-am install-strip install-uiDATA installcheck \
-	installcheck-am installdirs maintainer-clean \
+	clean-binPROGRAMS clean-generic clean-libtool cscopelist-am \
+	ctags ctags-am distclean distclean-compile distclean-generic \
+	distclean-libtool distclean-tags distdir dvi dvi-am html \
+	html-am info info-am install install-am install-binPROGRAMS \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
+	install-info install-info-am install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic pdf pdf-am ps ps-am tags tags-am uninstall \
-	uninstall-am uninstall-binPROGRAMS uninstall-local \
-	uninstall-uiDATA
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags tags-am uninstall uninstall-am uninstall-binPROGRAMS \
+	uninstall-local
 
 
 # Remove ui directory on uninstall

@@ -4,11 +4,9 @@
 
 
 uidir = $(pkgdatadir)/ui
-ui_DATA = cam_capture.ui
 
 
 AM_CPPFLAGS = \
-	-std=c++11 \
 	-DPACKAGE_LOCALE_DIR=\""$(localedir)"\" \
 	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
 	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\" \
@@ -21,15 +19,23 @@ AM_CFLAGS =\
 bin_PROGRAMS = cam_capture
 
 cam_capture_SOURCES = \
-	main.cc \
-	preview.h \
-	EasyBMP/EasyBMP.cpp \
-	EasyBMP/EasyBMP.h \
-	EasyBMP/EasyBMP_BMP.h \
-	EasyBMP/EasyBMP_DataStructures.h \
-	EasyBMP/EasyBMP_VariousBMPutilities.h \
-	serial.h \
-	serial.cpp
+	../cam_capture/main.cc \
+	../cam_capture/preview.h \
+	../cam_capture/serial.cpp \
+	../cam_capture/serial.h \
+	../cam_capture/ui.cpp \
+	../cam_capture/ui.h \
+	../cam_capture/EasyBMP/EasyBMP.cpp \
+	../cam_capture/EasyBMP/EasyBMP.h \
+	../cam_capture/EasyBMP/EasyBMP_BMP.h \
+	../cam_capture/EasyBMP/EasyBMP_DataStructures.h \
+	../cam_capture/EasyBMP/EasyBMP_VariousBMPutilities.h \
+	../cam_capture/cam_capture.h \
+	../cam_capture/linuxui.cpp \
+	../cam_capture/linuxui.h \
+	../cam_capture/cam_capture.cpp
+
+cam_capture_CXXFLAGS = -std=c++11 
 
 cam_capture_LDFLAGS = 
 

@@ -39,6 +39,7 @@ AM_CONDITIONAL(PLATFORM_WIN32, test x"$platform_win32" = "xyes")
 AM_CONDITIONAL(NATIVE_WIN32, test x"$native_win32" = "xyes")
 
 
+LT_INIT([win32-dll])
 
 
 PKG_CHECK_MODULES(CAM_CAPTURE, [gtkmm-3.0 ])

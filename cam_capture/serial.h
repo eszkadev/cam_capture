@@ -28,6 +28,11 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef _SERIAL_
+#define _SERIAL_
+
+#include <string>
+
 #ifdef __linux__
 	#include <unistd.h>
 	#include <fcntl.h>
@@ -35,6 +40,10 @@
 	#include <termios.h>
 	#include <string.h>
 	#include <stdlib.h>
+#else
+	#include <windows.h>
+	#include <tchar.h>
+	#include <string>
 #endif
 
 class Serial
@@ -51,21 +60,8 @@ public:
 	virtual void flush() = 0;
 };
 
-class WindowsSerialImpl : public Serial
-{
-public:
-	WindowsSerialImpl();
-	~WindowsSerialImpl();
-
-	virtual void open_port(const char* port_name);
-	virtual void set_baud(int baud);
-	virtual unsigned char read_byte();
-	virtual bool is_open();
-	virtual void close();
-	virtual void flush();
-};
-
 #ifdef __linux__
+
 class LinuxSerialImpl : public Serial
 {
 public:
@@ -84,4 +80,29 @@ private:
 	int _baud;
 	const char* _port_name;
 };
+
+#else
+
+class WindowsSerialImpl : public Serial
+{
+public:
+	WindowsSerialImpl();
+	~WindowsSerialImpl();
+
+	virtual void open_port(const char* port_name);
+	virtual void set_baud(int baud);
+	virtual unsigned char read_byte();
+	virtual bool is_open();
+	virtual void close();
+	virtual void flush();
+
+private:
+	HANDLE commHandle;
+	unsigned int bitrate;
+	std::string _port;
+	bool _is_open;
+};
+
+#endif
+
 #endif
